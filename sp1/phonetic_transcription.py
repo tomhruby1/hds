@@ -106,16 +106,17 @@ def transcribe(sent:str, rules:dict):
                     if idents[2] != '':
                         if DEBUG: print(f" right context ident: {idents[2]} on {right}")
                         if not match_identifier(idents[2], right):
-                            break
+                            continue
                     if idents[0] != '':
-                        #left_cont = left_cont[::-1] #reverse
                         if DEBUG: print(f" left context ident: {idents[0]} on {left}")
                         if not match_identifier(idents[0], left):
-                            break
+                            continue
+                    # all conditions met here 
                     print(f"using rule: {idents[0]}_{idents[1]}_{idents[2]}: {core} -> {result}")
                     out = get_result(result, core)
                     i_step = core_size
-                    break   # apply always only one rule from given ruleset per position 
+                    # apply always only one rule from given ruleset per position 
+                    break   
             txt_out = out + txt_out
             i += i_step 
         print(f"{rs_id}: {txt_out}")
@@ -139,5 +140,5 @@ if __name__=="__main__":
     #         print(f"wrong prediction: {x} -> {y_hat} \ncorrect: {y}")
     # print(f"total correct {correct}/{len(test_set)}")
 
-    y = transcribe("oběť", rules)
+    y = transcribe("dítě", rules)
     print(f"result: {y}")
