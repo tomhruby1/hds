@@ -50,6 +50,8 @@ def match_char(ident, target):
         ident = get_var(ident)
     if target in ident:
         return True
+    if ident == '#' and target == '$':    # bad hacking to cover $ by #
+        return True
     return False
 
 def match_identifier(ident, txt):
@@ -115,8 +117,7 @@ def transcribe(sent:str, rules:dict):
                     print(f"using rule: {idents[0]}_{idents[1]}_{idents[2]}: {core} -> {result}")
                     out = get_result(result, core)
                     i_step = core_size
-                    # apply always only one rule from given ruleset per position 
-                    break   
+                    break  # apply always only one rule from given ruleset per [i] position 
             txt_out = out + txt_out
             i += i_step 
         print(f"{rs_id}: {txt_out}")
@@ -140,5 +141,5 @@ if __name__=="__main__":
     #         print(f"wrong prediction: {x} -> {y_hat} \ncorrect: {y}")
     # print(f"total correct {correct}/{len(test_set)}")
 
-    y = transcribe("dítě", rules)
+    y = transcribe("zvěř chodí", rules) #spravne ze D tady?
     print(f"result: {y}")
