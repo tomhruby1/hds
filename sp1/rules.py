@@ -4,13 +4,15 @@ import json
 V = ['i', 'e', 'a', 'o', 'u', 'I', 'A', 'O', 'U', 'y', 'Y', 'F'] #samohlasky
 K = ['f', 'v', 's', 'z', 'S', 'Z', 'x', 'h', 'l', 'r', 'R', 'j', 'p', 'b', 't', 'd', 'T', 'D', 'k', 'g', 
      'm','n', 'J', 'c', 'C', 'w', 'W', 'N', 'M', 'G', 'Q', 'P', 'L', 'H'] #souhlasky
-# parove korespondence
+K_rl = ['f', 'v', 's', 'z', 'S', 'Z', 'x', 'h', 'R', 'j', 'p', 'b', 't', 
+        'd', 'T', 'D', 'k', 'g', 'm','n', 'J', 'c', 'C', 'w', 'W', 'N', 'M', 'G', 'Q', 'H'] #souhlasky bez r a l, a jejich slabikotvor. variant
+# souhlasky, parove korespondence
 ZPK = ['b','d', 'D', 'g', 'v', 'z', 'Z', 'h', 'w', 'W', 'R']    #znele parove souhlasky
-NPK = ['p','t', 'T', 'k', 'f', 's', 'S', 'X', 'c', 'C', 'Q']    #neznele parove souhlasky
+NPK = ['p','t', 'T', 'k', 'f', 's', 'S', 'x', 'c', 'C', 'Q']    #neznele parove souhlasky
 JK  = ['m', 'n', 'J', 'l', 'r', 'j']    #jedinecne souhlasky 
-
-NP = ['k', 's', 'v', 'z'] #neslabicne predlozky
-JPZ = ['bez', 'nad', 'ob', 'od', 'pod', 'pRed'] #jednoslab. predlozky
+# predlozky 
+NP = ['k', 's', 'v', 'z'] #neslabicne
+JPZ = ['bez', 'nad', 'ob', 'od', 'pod', 'pRed'] #jednoslab.
 
 
 # --- FIRST TRANSLATE TO FONETIC UNITS ---
@@ -57,7 +59,7 @@ rules[3] = {
 
     '_d+ě_': 'De',
     '_t+ě_': 'Te',
-    '_n+e_': 'Je',
+    '_n+ě_': 'Je',
     '_m+ě_': 'mJe'
 }
 
@@ -68,18 +70,49 @@ rules[4] = {
     '#,#+|_$V_': '!*', # asterisk --the og char 
 }
 
-
-# --- SECOND OPERATIONS USING FONETIC UNITS ---
-# 2.26, ignoruju prefixovy predel
-# TODO: dodat !
-# spodoba (asimilace) znelosti
-rules[5] = {
-    # vyjimky
-    #'_v_$NPK':'f',
+# --- 2.26: spodoba (asimilace) znelosti ---  
+# zde prace uz s fonet. znaky
+# ignoruju prefixovy predel
+# vyjimky rules[6] ... musi byt tady TODO: txt se zatim naupdatuje uvnitr rulesetu 
+#       ... mozna dobre ruleset by mel byt vylucny?
+rules[6] = {
+    #'_v_$NPK':'f', #asi funguje i bez
+    '_$NPK_v,|+v': '*',
+    '_$ZPK_|+v': '$~ZPK', # 2.28.3 ... v specialita
+    '$NPK_R_': 'Q',
+}
+rules[7] = {
     # main stuff
     '_$ZPK_$NPK,|+$NPK,|+$JK,|+$V,|+#' : '$~ZPK', 
-    '_$NPK_$ZPK,|+$ZPK': '$~NPK'
+    '_$NPK_$ZPK,|+$ZPK': '$~NPK' # 
+}
+# TODO prefixovy sev '-'
+
+# --- 2.33... asimilace artikulacni ----
+# TODO: pro 'nadseni' musi byt pred 6?
+rules[5] = {
+    '_n_k,g': 'N',
+    '_m_v,f': 'M',
+    # 2.35 zanedbano
+    '_n_T,D': 'J', # volim zmekceni u 2.36
+    #'_t+|+s_': 'ts', # hmmm?
+    '_t+s_': 'c', # nespisovne jenom na hranici slov? -- nebo v miste slozeni slova?
+    '_t+S_': 'C',
+
+}
+# slabikotvorne souhlasky 
+rules[8] = {
+    '$K_r_$K,|': 'P',
+    '$K_l_$K,|': 'L',
+    '$K_m_$Krl,|': 'H'
 }
 
-with open('rules2.json', 'w', encoding='UTF-8') as f:
+# zjednodussena vyslovnost souhlaskovych skupin
+rules[9] = {
+    '_z+S+T+I_': 'STI'
+}
+
+with open('rules.json', 'w', encoding='UTF-8') as f:
     json.dump(rules, f )
+
+print("Rules saved.")

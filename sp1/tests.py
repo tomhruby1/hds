@@ -1,5 +1,4 @@
-
-from phonetic_transcription import V, K, ZPK, NPK, JK, NP, JPZ
+from rules import V,K,K_rl,ZPK,JK,NP,JPZ
 from phonetic_transcription import match_identifier
 
 DEBUG = False

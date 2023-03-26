@@ -1,15 +1,5 @@
 import json
-
-V = ['i', 'e', 'a', 'o', 'u', 'I', 'A', 'O', 'U', 'y', 'Y', 'F'] #samohlasky
-K = ['f', 'v', 's', 'z', 'S', 'Z', 'x', 'h', 'l', 'r', 'R', 'j', 'p', 'b', 't', 'd', 'T', 'D', 'k', 'g', 
-     'm','n', 'J', 'c', 'C', 'w', 'W', 'N', 'M', 'G', 'Q', 'P', 'L', 'H'] #souhlasky
-# souhlasky, parove korespondence
-ZPK = ['b','d', 'D', 'g', 'v', 'z', 'Z', 'h', 'w', 'W', 'R']    #znele parove souhlasky
-NPK = ['p','t', 'T', 'k', 'f', 's', 'S', 'X', 'c', 'C', 'Q']    #neznele parove souhlasky
-JK  = ['m', 'n', 'J', 'l', 'r', 'j']    #jedinecne souhlasky 
-# predlozky 
-NP = ['k', 's', 'v', 'z'] #neslabicne
-JPZ = ['bez', 'nad', 'ob', 'od', 'pod', 'pRed'] #jednoslab.
+from rules import V,K,K_rl,ZPK,NPK,JK,NP,JPZ
 
 def get_var(s):
     if s[0] != '$': return
@@ -24,6 +14,8 @@ def get_var(s):
         return V
     elif varname == 'K':
         return K
+    elif varname == 'Krl':
+        return K_rl
     else:
         raise Exception(f'Unknown variable {s}')
 
@@ -82,7 +74,7 @@ def transcribe(sent:str, rules:dict):
     if DEBUG: print(sent)
 
     txt_out = sent
-    for rs_id, ruleset in rules.items():
+    for rs_id, ruleset in sorted(rules.items()):
         txt = txt_out[::-1] #reverse, use already translated sequence for the next ruleset application
         txt_out = ""
         i = 0
@@ -141,5 +133,11 @@ if __name__=="__main__":
     #         print(f"wrong prediction: {x} -> {y_hat} \ncorrect: {y}")
     # print(f"total correct {correct}/{len(test_set)}")
 
-    y = transcribe("zvěř chodí", rules) #spravne ze D tady?
+    # y = transcribe("zvěř chodí", rules) 
+    # y = transcribe("přítel", rules)
+    # y = transcribe("nashledanou", rules)
+    # y = transcribe("pět švestek", rules) #ahh rule 6.2 -- aplikuje se i kdyz by nemusel?
+    # y = transcribe("hrob", rules)
+    y = transcribe("francouzští", rules)
+    y = transcribe('pražští', rules)
     print(f"result: {y}")
