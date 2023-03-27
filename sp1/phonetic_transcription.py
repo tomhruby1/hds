@@ -1,4 +1,5 @@
 import json
+import sys
 from rules import V,K,K_rl,ZPK,NPK,JK,NP,JPZ
 
 def get_var(s):
@@ -16,6 +17,10 @@ def get_var(s):
         return K
     elif varname == 'Krl':
         return K_rl
+    elif varname == 'NP':
+        return NP
+    elif varname == 'JPZ':
+        return JPZ
     else:
         raise Exception(f'Unknown variable {s}')
 
@@ -60,10 +65,11 @@ def match_identifier(ident, txt):
         if all_good: return True
     return False
 
-DEBUG = False
-ctx_size = 2 #left and right maximum context size
+ctx_size = 3 #left and right maximum context size
 
 def transcribe(sent:str, rules:dict):
+    ''' transcribing sentence according to given rules'''
+    
     if DEBUG: print(sent)
     # preprocessing na urovni vety 
     sent = sent.lower()
@@ -95,32 +101,47 @@ def transcribe(sent:str, rules:dict):
                 right = txt[max(0,i-ctx_size_R):i][::-1] # right context
                 i_step = 1
                 if match_identifier(idents[1], core):
-                    if DEBUG: print(f"char matched {idents[1]}: {core}, condition: {cond}")
+                    #if DEBUG: print(f"char matched {idents[1]}: {core}, condition: {cond}")
                     # context check ... if specified it has to pass
                     if idents[2] != '':
-                        if DEBUG: print(f" right context ident: {idents[2]} on {right}")
                         if not match_identifier(idents[2], right):
                             continue
                     if idents[0] != '':
-                        if DEBUG: print(f" left context ident: {idents[0]} on {left}")
                         if not match_identifier(idents[0], left):
                             continue
                     # all conditions met here 
-                    print(f"using rule: {idents[0]}_{idents[1]}_{idents[2]}: {core} -> {result}")
+                    if DEBUG: print(f"using rule: {idents[0]}_{idents[1]}_{idents[2]}: {core} -> {result}")
                     out = get_result(result, core)
                     i_step = core_size
                     break  # apply always only one rule from given ruleset per [i] position 
             txt_out = out + txt_out
             i += i_step 
-        print(f"{rs_id}: {txt_out}")
+        if DEBUG: print(f"{rs_id}: {txt_out}")
     return txt_out
 
+DEBUG = True
 
 if __name__=="__main__":
-    # run test set
+    # transcribe input file
     with open('rules.json', 'r', encoding='UTF-8') as f:
         rules = json.load(f)
-    
+
+    if len(sys.argv) > 1:
+        p = sys.argv[1]
+        print(f"loading input text from {p}")
+        with open(p, 'r') as f:
+            in_txt = f.readlines()
+        out_txt = []
+        for sent in in_txt:
+            out_txt.append(transcribe(sent, rules))
+        # write result
+        out_p = "vety_HDS.phntrn.txt"
+        if len(sys.argv) > 2:
+            out_p = sys.argv[2]
+        with open(out_p, 'w') as f:
+            f.writelines(l + '\n' for l in out_txt)
+
+    # run test set
     # with open('test.json', 'r') as f:
     #     test_set = json.load(f)
 
@@ -130,7 +151,7 @@ if __name__=="__main__":
     #     if y_hat == y:
     #         correct += 1
     #     else:
-    #         print(f"wrong prediction: {x} -> {y_hat} \ncorrect: {y}")
+    #         print(f"wrong prediction: {x} -> {y_hat}, correct is: {y}")
     # print(f"total correct {correct}/{len(test_set)}")
 
     # y = transcribe("zvěř chodí", rules) 
@@ -138,6 +159,8 @@ if __name__=="__main__":
     # y = transcribe("nashledanou", rules)
     # y = transcribe("pět švestek", rules) #ahh rule 6.2 -- aplikuje se i kdyz by nemusel?
     # y = transcribe("hrob", rules)
-    y = transcribe("francouzští", rules)
-    y = transcribe('pražští', rules)
+    # y = transcribe("francouzští", rules)
+    # y = transcribe('pražští', rules)
+    # y = transcribe('bez únavy', rules)
+    y = transcribe('od reformního', rules)
     print(f"result: {y}")

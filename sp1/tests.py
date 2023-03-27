@@ -1,7 +1,45 @@
+import json
 from rules import V,K,K_rl,ZPK,JK,NP,JPZ
 from phonetic_transcription import match_identifier
 
 DEBUG = False
+
+
+test_set = {
+    # 1
+    'kobyla': '|$|kobila|$|',
+    'pýcha': '|$|pIxa|$|',
+    'růže': '|$|rUZe|$|',
+    'chata': '|$|xata|$|',
+    # 2
+    'koukat': '|$|kykat|$|',
+    'auto': '|$|Yto|$|',
+    'eunuch': '|$|Fnux|$|',
+    # 3
+    'oběť': '|$|objeT|$|',
+    'opěra': '|$|opjera|$|',
+    'závěr': '|$|zAvjer|$|',
+    'dítě': '|$|DITe|$|',
+    'ničit': '|$|JiCit|$|',
+    'dělat': '|$|Delat|$|',
+    'štěně': '|$|STeJe|$|',
+    'město': '|$|mJesto|$|',
+    # 4
+    'celá Evropa': '|$|celA|!evropa|$|',
+    's uchem': '|$|s|!uxem|$|',
+    'v okně': '|$|f|!okJe|$|',
+    'Odvezl ho': '|$|!odvezl|ho|$|',
+    'domů, ale': '|$|domU|#|!ale|$|',
+    # 5 -- asimilace znelosti
+    'lov medvědů': '|$|lof|medvjedU|$|',
+    'opravte': '|$|oprafte|$|',
+
+}
+
+with open('test.json', 'w', encoding='UTF-8') as f:
+    json.dump(test_set, f)
+
+
 
 def match_identifier_test():
     # correct mapping ident -> target text
